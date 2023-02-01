@@ -60,24 +60,15 @@ local lang = setmetatable({}, {
   end,
 })
 
-local attrBasedElementMT = {
-  __index = (function()
-    local fields = {
-      attr = true,
-      kids = true,
-      line = true,
-      text = true,
-      type = true,
-    }
-    return function(_, k)
-      assert(fields[k], 'invalid table key ' .. k)
-    end
-  end)(),
-  __metatable = 'attrBasedElementMT',
-  __newindex = function()
-    error('cannot add fields')
-  end,
-}
+local newtype = require('wowless.struct')
+
+local mkAttrBasedElement = newtype('attrBasedElementMT', {
+  attr = 'table',
+  kids = 'table',
+  line = 'number',
+  text = 'string',
+  type = 'string',
+})
 
 local attrMTs = setmetatable({}, {
   __index = function(t, k)
