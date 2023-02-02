@@ -169,13 +169,13 @@ local function parseRoot(product, root, intrinsics, snapshot)
         table.insert(texts, kid._text)
         line = line or kid._line
       end
-      return setmetatable({
+      return mixin(mkAttrBasedElement(), {
         attr = setmetatable(resultAttrs, attrMTs[product][tname]),
         kids = {},
         line = line,
         text = #texts > 0 and table.concat(texts, '\n') or nil,
         type = tname,
-      }, attrBasedElementMT)
+      })
     else
       local resultKids = {}
       for _, kid in ipairs(e._children or {}) do
@@ -196,11 +196,11 @@ local function parseRoot(product, root, intrinsics, snapshot)
           text = ty.text,
         }
       end
-      return setmetatable({
+      return mixin(mkAttrBasedElement(), {
         attr = setmetatable(resultAttrs, attrMTs[product][tname]),
         kids = resultKids,
         type = tname,
-      }, attrBasedElementMT)
+      })
     end
   end
   local result = run(root, 'toplevel', {
