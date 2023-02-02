@@ -169,7 +169,7 @@ local function parseRoot(product, root, intrinsics, snapshot)
         table.insert(texts, kid._text)
         line = line or kid._line
       end
-      return mixin(mkAttrBasedElement(), {
+      return mkAttrBasedElement({
         attr = setmetatable(resultAttrs, attrMTs[product][tname]),
         kids = {},
         line = line,
@@ -196,7 +196,7 @@ local function parseRoot(product, root, intrinsics, snapshot)
           text = ty.text,
         }
       end
-      return mixin(mkAttrBasedElement(), {
+      return mkAttrBasedElement({
         attr = setmetatable(resultAttrs, attrMTs[product][tname]),
         kids = resultKids,
         type = tname,

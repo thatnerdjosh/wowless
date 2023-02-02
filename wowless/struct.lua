@@ -22,9 +22,16 @@ local function newtype(name, fieldsarg)
     assert(type(v) == ty, 'type mismatch')
     t[k] = v
   end
-  return function()
+  return function(init)
     local ref = newproxy(typeproxy)
     instances[ref] = {}
+    if init ~= nil then
+      for k in pairs(fields) do
+        if init[k] ~= nil then
+          ref[k] = init[k]
+        end
+      end
+    end
     return ref
   end
 end
