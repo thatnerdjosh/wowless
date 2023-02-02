@@ -62,7 +62,7 @@ local lang = setmetatable({}, {
 
 local newtype = require('wowless.struct')
 
-local mkAttrBasedElement = newtype('attrBasedElementMT', {
+local mkXmlElement = newtype('xmlElement', {
   attr = 'table',
   kids = 'table',
   line = 'number',
@@ -169,7 +169,7 @@ local function parseRoot(product, root, intrinsics, snapshot)
         table.insert(texts, kid._text)
         line = line or kid._line
       end
-      return mkAttrBasedElement({
+      return mkXmlElement({
         attr = setmetatable(resultAttrs, attrMTs[product][tname]),
         kids = {},
         line = line,
@@ -196,7 +196,7 @@ local function parseRoot(product, root, intrinsics, snapshot)
           text = ty.text,
         }
       end
-      return mkAttrBasedElement({
+      return mkXmlElement({
         attr = setmetatable(resultAttrs, attrMTs[product][tname]),
         kids = resultKids,
         type = tname,
@@ -241,6 +241,7 @@ local function xml2dom(xmlstr)
 end
 
 return {
+  mkXmlElement = mkXmlElement,
   newParser = function(product)
     local intrinsics = {}
     return function(xmlstr)

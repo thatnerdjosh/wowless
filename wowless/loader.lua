@@ -6,7 +6,8 @@ local function loader(api, cfg)
   local datalua = require('build.products.' .. product .. '.data')
 
   local path = require('path')
-  local parseXml = require('wowless.xml').newParser(product)
+  local xmllib = require('wowless.xml')
+  local parseXml = xmllib.newParser(product)
   local util = require('wowless.util')
   local mixin = util.mixin
   local intrinsics = {}
@@ -523,7 +524,11 @@ local function loader(api, cfg)
           elseif type(impl) == 'table' and impl.scope then
             loadElements(mixin({}, ctx, { [impl.scope] = true }), e.kids, parent)
           elseif type(impl) == 'table' then
-            local elt = impl.argument == 'lastkid' and e.kids[#e.kids] or mixin({}, e, { type = impl.argument })
+            local elt = impl.argument == 'lastkid' and e.kids[#e.kids]
+            if not elt then
+              elt = xmllib.mkXmlElement(e)
+              elt.type = impl.argument
+            end
             local obj = loadElement(ctx, elt, parent)
             local up = api.UserData(parent)
             -- TODO find if this if needs to be broader to everything here including kids
