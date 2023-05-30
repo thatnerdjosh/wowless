@@ -127,31 +127,37 @@ local function new(log, maxErrors, product)
     end
   end
 
-  local function DoUpdateVisible(obj, script)
+  local function DoUpdateVisibleBit(obj, visible)
+    obj.visible = visible
     for kid in obj.children:entries() do
       if kid.shown then
-        DoUpdateVisible(kid, script)
+        DoUpdateVisibleBit(kid, visible)
+      end
+    end
+  end
+
+  local function DoCallOnShowOnHide(obj, script)
+    for kid in obj.children:entries() do
+      if kid.shown then
+        DoCallOnShowOnHide(kid, script)
       end
     end
     RunScript(obj, script)
   end
 
-  local function UpdateVisible(obj, fn)
-    local wasVisible = obj:IsVisible()
-    fn()
-    local visibleNow = obj:IsVisible()
+  local function UpdateVisible(obj)
+    local wasVisible = obj.visible
+    local visibleNow = obj.shown and (not obj.parent or obj.parent.visible)
     if wasVisible ~= visibleNow then
-      DoUpdateVisible(obj, visibleNow and 'OnShow' or 'OnHide')
+      DoUpdateVisibleBit(obj, visibleNow)
+      DoCallOnShowOnHide(obj, visibleNow and 'OnShow' or 'OnHide')
     end
   end
 
   local function SetParent(obj, parent)
+    DoSetParent(obj, parent)
     if obj.IsVisible then
-      UpdateVisible(obj, function()
-        DoSetParent(obj, parent)
-      end)
-    else
-      DoSetParent(obj, parent)
+      UpdateVisible(obj)
     end
   end
 
@@ -218,8 +224,8 @@ local function new(log, maxErrors, product)
       obj:SetID(id)
     end
     RunScript(ud, 'OnLoad')
-    if InheritsFrom(typename, 'region') and obj:IsVisible() then
-      RunScript(ud, 'OnShow')
+    if InheritsFrom(typename, 'regionbase') then
+      UpdateVisible(ud)
     end
     if objtype.zombie then
       setmetatable(obj, nil)

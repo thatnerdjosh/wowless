@@ -1,5 +1,4 @@
 return (function(self, shown)
-  api.UpdateVisible(self, function()
-    self.shown = not not shown
-  end)
+  self.shown = not not shown
+  api.UpdateVisible(self)
 end)(...)

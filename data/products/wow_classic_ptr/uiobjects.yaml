@@ -1557,6 +1557,9 @@ RegionBase:
     shown:
       init: true
       type: boolean
+    visible:
+      init: false
+      type: boolean
   inherits: {}
   methods:
     GetAlpha:
@@ -1571,7 +1574,8 @@ RegionBase:
       getter:
       - name: shown
     IsVisible:
-      impl: Region/IsVisible
+      getter:
+      - name: visible
     SetAlpha:
       impl: Region/SetAlpha
     SetScale:
