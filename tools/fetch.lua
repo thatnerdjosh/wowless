@@ -51,14 +51,27 @@ if path.isdir(outdir) then
   require('pl.dir').rmtree(outdir)
 end
 
+local cmap = {}
+
 local save = (function()
   local saved = {}
-  return function(fn, content)
+  local bin, hex = require('casc.bin').to_bin, require('casc.bin').to_hex
+  return function(fn, content, fdid)
     if not saved[fn:lower()] then
       log('writing', fn)
       path.mkdir(path.dirname(path.join(outdir, fn)))
       require('pl.file').write(path.join(outdir, fn), content)
       saved[fn:lower()] = true
+      local ckey = bin(handle:getFileContentHash(fdid or fn))
+      local ekey = handle.encoding:getEncodingHash(ckey)[1]
+      local rstart, rend, archive = handle.indexCDN[ekey:sub(1, 9)]:match('(%d+)%-(%d+):(.+)')
+      cmap[fn] = {
+        archive = archive,
+        ckey = hex(ckey),
+        ekey = hex(ekey),
+        rstart = tonumber(rstart),
+        rend = tonumber(rend),
+      }
     end
   end
 end)()
@@ -114,7 +127,8 @@ local function processTocDir(dir)
 end
 
 for _, db in ipairs(require('build.products.' .. product .. '.dblist')) do
-  save(path.join('db2', db .. '.db2'), handle:readFile(fdids[db:lower()]))
+  local fdid = fdids[db:lower()]
+  save(path.join('db2', db .. '.db2'), handle:readFile(fdid), fdid)
 end
 
 processTocDir('Interface/FrameXML')
@@ -128,3 +142,5 @@ do
 end
 processFile('Interface/FrameXML/UI.xsd')
 processFile('Interface/FrameXML/UI_Shared.xsd')
+
+require('pl.file').write('build/products/' .. args.product .. '/cmap.yaml', require('wowapi.yaml').pprint(cmap))
