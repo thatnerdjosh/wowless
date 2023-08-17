@@ -20,6 +20,6 @@ RUN apt-get update \
     && pip install git+https://github.com/luarocks/hererocks cmake pre-commit \
     && hererocks -l 5.1 -r 3.8.0 /usr/local \
     && git config --system --add safe.directory '*'
-WORKDIR /wowless
+WORKDIR /workspaces/wowless
 COPY wowless-scm-0.rockspec .
 RUN luarocks build

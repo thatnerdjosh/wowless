@@ -13,11 +13,10 @@
       ]
     }
   },
-  "features": {
-    "ghcr.io/devcontainers/features/github-cli:1": {}
-  },
   "name": "wowless/wowless",
   "postCreateCommand": "pre-commit install --install-hooks",
   "remoteUser": "vscode",
-  "runArgs": ["--env-file", ".env"]
+  "containerUser": "vscode",
+  "workspaceMount": "",
+  "runArgs": ["--volume=${localWorkspaceFolder}:/workspaces/${localWorkspaceFolderBasename}:Z", "--env-file", ".env", "--userns=keep-id"]
 }
